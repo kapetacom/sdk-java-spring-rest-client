@@ -1,5 +1,6 @@
 package com.blockware.spring.restclient;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -21,6 +22,7 @@ import java.util.Set;
  * This class is invoked by @Import(RestClientBeanRegistrar.class) on a configuration class and will scan the
  * package that the configuration class is placed in.
  */
+@Slf4j
 public class RestClientBeanRegistrar implements ImportBeanDefinitionRegistrar {
 
     private AnnotationBeanNameGenerator annotationBeanNameGenerator = new AnnotationBeanNameGenerator();
@@ -48,11 +50,10 @@ public class RestClientBeanRegistrar implements ImportBeanDefinitionRegistrar {
                 bean.setLazyInit(true);
                 bean.getConstructorArgumentValues().addIndexedArgumentValue(0, candidate.getBeanClassName());
 
+                log.info("Found REST client {} for class {}", beanName, candidate.getBeanClassName());
                 registry.registerBeanDefinition(beanName, bean);
 
             }
-
-
         }
     }
 }
