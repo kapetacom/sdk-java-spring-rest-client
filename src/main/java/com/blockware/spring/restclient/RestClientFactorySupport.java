@@ -60,7 +60,7 @@ public class RestClientFactorySupport {
 
         T out = retrofit.create(restClientInterface);
 
-        log.info("Created Retrofit client for {}", serviceName);
+        log.info("Created Retrofit client for {} - service name: {}", restClientInterface, serviceName);
 
         return out;
     }
