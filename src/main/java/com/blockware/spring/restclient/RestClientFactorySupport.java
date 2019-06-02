@@ -49,12 +49,13 @@ public class RestClientFactorySupport {
         }
 
         String serviceName = restClient.value();
-        final OkHttpClient okHttpClient = buildInternalServiceClient(serviceName);
-        final Retrofit retrofit = buildRetrofit(serviceName, okHttpClient);
 
         final String baseUrl = getBaseUrlForService(serviceName);
+        final OkHttpClient okHttpClient = buildInternalServiceClient(serviceName);
+        final Retrofit retrofit = buildRetrofit(baseUrl, okHttpClient);
 
         T out = retrofit.create(restClientInterface);
+
 
         log.info("Created Retrofit client for {} - service name: {}, base url: {}", restClientInterface, serviceName, baseUrl);
 
@@ -76,9 +77,7 @@ public class RestClientFactorySupport {
         return base;
     }
 
-    private Retrofit buildRetrofit(String serviceName, OkHttpClient client) {
-
-        final String baseUrl = getBaseUrlForService(serviceName);
+    private Retrofit buildRetrofit(String baseUrl, OkHttpClient client) {
 
         return new Retrofit.Builder()
                 .addConverterFactory(defaultConverter())
