@@ -2,11 +2,12 @@ package com.blockware.spring.restclient;
 
 
 import com.blockware.spring.annotation.BlockwareRestClient;
+import com.blockware.spring.config.BlockwareConfigSource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -22,23 +23,18 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class RestClientFactorySupport {
 
-    @Value("${client.timeout_connect:15000}")
-    private int clientConnectTimeout;
+    private static final String RESTCLIENT_PREFIX = "blockware.clients.";
+    public static final String SERVICE_TYPE = "rest";
 
-    @Value("${client.timeout_read:120000}")
-    private int clientReadTimeout;
-
-    @Value("${client.timeout_write:120000}")
-    private int clientWriteTimeout;
-
-    @Value("${client.max_retries:100}")
-    private int clientMaxRetries;
-
-    @Value("${client.retry_wait:5000}")
-    private long clientRetryWait;
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private Environment environment;
+
+    @Autowired
+    private BlockwareConfigSource blockwareConfigSource;
 
     public <T> T makeClient(Class<T> restClientInterface) {
 
@@ -53,35 +49,83 @@ public class RestClientFactorySupport {
         }
 
         String serviceName = restClient.value();
-
-
-        final OkHttpClient okHttpClient = buildInternalServiceClient();
+        final OkHttpClient okHttpClient = buildInternalServiceClient(serviceName);
         final Retrofit retrofit = buildRetrofit(serviceName, okHttpClient);
+
+        final String baseUrl = getBaseUrlForService(serviceName);
 
         T out = retrofit.create(restClientInterface);
 
-        log.info("Created Retrofit client for {} - service name: {}", restClientInterface, serviceName);
+        log.info("Created Retrofit client for {} - service name: {}, base url: {}", restClientInterface, serviceName, baseUrl);
 
         return out;
     }
 
+    public String getBaseUrlForService(String serviceName) {
+
+        String base = getString(serviceName, "base", null);
+
+        if (base == null || base.isEmpty()) {
+            base = blockwareConfigSource.getClientAddress(serviceName, SERVICE_TYPE);
+        }
+
+        if (base == null || base.isEmpty()) {
+            base = "http://" + serviceName.toLowerCase();
+        }
+
+        return base;
+    }
+
     private Retrofit buildRetrofit(String serviceName, OkHttpClient client) {
+
+        final String baseUrl = getBaseUrlForService(serviceName);
 
         return new Retrofit.Builder()
                 .addConverterFactory(defaultConverter())
                 .addCallAdapterFactory(new SimpleCallAdapterFactory())
                 .client(client)
-                .baseUrl("http://" + serviceName.toLowerCase() + "/")
+                .baseUrl(baseUrl)
                 .build();
     }
 
-    private OkHttpClient buildInternalServiceClient() {
+    private OkHttpClient buildInternalServiceClient(String serviceName) {
+
+        long defaultConnectTimeout = getDefaultLong( "client.timeout_connect", 15000);
+        long defaultReadTimeout = getDefaultLong("client.timeout_read", 120000);
+        long defaultWriteTimeout = getDefaultLong("client.timeout_write", 120000);
+
+        long connectTimeout = getLong(serviceName, "client.timeout_connect", defaultConnectTimeout);
+        long readTimeout = getLong(serviceName, "client.timeout_read", defaultReadTimeout);
+        long writeTimeout = getLong(serviceName, "client.timeout_write", defaultWriteTimeout);
+
         return new OkHttpClient.Builder()
-                .connectTimeout(clientConnectTimeout, TimeUnit.MILLISECONDS)
-                .readTimeout(clientReadTimeout, TimeUnit.MILLISECONDS)
-                .writeTimeout(clientWriteTimeout, TimeUnit.MILLISECONDS)
+                .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
+                .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
+                .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
                 .build();
     }
+
+    private String getString(String serviceName, String key, String defaultValue) {
+
+        String configId = RESTCLIENT_PREFIX + serviceName.toLowerCase() + ".rest." + key;
+
+        return environment.getProperty(configId, defaultValue);
+    }
+
+    private long getLong(String serviceName, String key, long defaultValue) {
+
+        String configId = RESTCLIENT_PREFIX + serviceName.toLowerCase() + ".rest." + key;
+
+        return environment.getProperty(configId, Long.class, defaultValue);
+    }
+
+    private long getDefaultLong(String key, long defaultValue) {
+
+        String configId = RESTCLIENT_PREFIX +  "default.rest." + key;
+
+        return environment.getProperty(configId, Long.class, defaultValue);
+    }
+
 
     private Converter.Factory defaultConverter() {
         return JacksonConverterFactory.create(objectMapper);
