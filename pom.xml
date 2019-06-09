@@ -8,6 +8,7 @@
     <groupId>com.blockware.spring-boot</groupId>
     <artifactId>rest-client</artifactId>
     <version>0.0.1</version>
+    <packaging>jar</packaging>
 
     <licenses>
         <license>
@@ -20,7 +21,6 @@
     <distributionManagement>
         <repository>
             <id>blockware</id>
-            <name>blockware</name>
             <url>https://api.bintray.com/maven/blockware/maven/sdk-java-spring-rest-client/;publish=1</url>
         </repository>
     </distributionManagement>
@@ -29,6 +29,13 @@
         <url>https://github.com/blockwarecom/sdk-java-spring-rest-client#readme</url>
         <connection>git+https://github.com/blockwarecom/sdk-java-spring-rest-client.git</connection>
     </scm>
+
+    <repositories>
+        <repository>
+            <id>blockware</id>
+            <url>https://dl.bintray.com/blockware/maven</url>
+        </repository>
+    </repositories>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -75,8 +82,7 @@
         <dependency>
             <groupId>com.blockware.spring-boot</groupId>
             <artifactId>spring-boot</artifactId>
-            <version>0.0.1</version>
-            <scope>compile</scope>
+            <version>[0.0.1,0.1.0)</version>
         </dependency>
     </dependencies>
 
