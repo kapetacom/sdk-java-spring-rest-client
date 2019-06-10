@@ -2,7 +2,7 @@ package com.blockware.spring.restclient;
 
 
 import com.blockware.spring.annotation.BlockwareRestClient;
-import com.blockware.spring.config.BlockwareConfigSource;
+import com.blockware.spring.cluster.BlockwareClusterService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
@@ -34,7 +34,7 @@ public class RestClientFactorySupport {
     private Environment environment;
 
     @Autowired
-    private BlockwareConfigSource blockwareConfigSource;
+    private BlockwareClusterService blockwareConfigSource;
 
     public <T> T makeClient(Class<T> restClientInterface) {
 
@@ -67,7 +67,7 @@ public class RestClientFactorySupport {
         String base = getString(serviceName, "base", null);
 
         if (base == null || base.isEmpty()) {
-            base = blockwareConfigSource.getClientAddress(serviceName, SERVICE_TYPE);
+            base = blockwareConfigSource.getServiceAddress(serviceName, SERVICE_TYPE);
         }
 
         if (base == null || base.isEmpty()) {
