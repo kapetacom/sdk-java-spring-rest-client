@@ -7,7 +7,7 @@
 
     <groupId>com.blockware.spring-boot</groupId>
     <artifactId>rest-client</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.6</version>
     <packaging>jar</packaging>
 
     <licenses>
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>com.blockware.spring-boot</groupId>
             <artifactId>spring-boot</artifactId>
-            <version>0.0.5</version>
+            <version>0.0.6</version>
         </dependency>
     </dependencies>
 
