@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class RestClientFactorySupport {
 
-    private static final String RESTCLIENT_PREFIX = "blockware.clients.";
+    private static final String RESTCLIENT_PREFIX = "kapeta.clients.";
     public static final String SERVICE_TYPE = "rest";
 
 
@@ -34,7 +34,7 @@ public class RestClientFactorySupport {
     private Environment environment;
 
     @Autowired
-    private KapetaClusterService blockwareConfigSource;
+    private KapetaClusterService kapetaConfigSource;
 
     public <T> T makeClient(Class<T> restClientInterface) {
 
@@ -67,7 +67,7 @@ public class RestClientFactorySupport {
         String base = getString(serviceName, "base", null);
 
         if (base == null || base.isEmpty()) {
-            base = blockwareConfigSource.getServiceAddress(serviceName, SERVICE_TYPE);
+            base = kapetaConfigSource.getServiceAddress(serviceName, SERVICE_TYPE);
         }
 
         if (base == null || base.isEmpty()) {

@@ -15,7 +15,7 @@ import java.util.Set;
 
 
 /**
- * Reads all interfaces annotated with BlockwareRestClient and generates RestClientFactoryBean beans for them.
+ * Reads all interfaces annotated with KapetaRestClient and generates RestClientFactoryBean beans for them.
  *
  * The Retrofit clients are lazely initialised to only do work when work is needed.
  *

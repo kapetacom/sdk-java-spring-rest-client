@@ -1,2 +1,2 @@
-# REST client support for Blockware Spring Boot SDK
+# REST client support for Kapeta Spring Boot SDK
 Based on Retrofit
