@@ -2,8 +2,8 @@ package com.kapeta.spring.restclient;
 
 
 import com.kapeta.spring.annotation.KapetaRestClient;
-import com.blockware.spring.cluster.BlockwareClusterService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kapeta.spring.cluster.KapetaClusterService;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class RestClientFactorySupport {
     private Environment environment;
 
     @Autowired
-    private BlockwareClusterService blockwareConfigSource;
+    private KapetaClusterService blockwareConfigSource;
 
     public <T> T makeClient(Class<T> restClientInterface) {
 
