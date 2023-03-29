@@ -1,4 +1,4 @@
-package com.blockware.spring.restclient;
+package com.kapeta.spring.restclient;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;

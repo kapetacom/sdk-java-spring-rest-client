@@ -1,7 +1,7 @@
-package com.blockware.spring.restclient;
+package com.kapeta.spring.restclient;
 
 
-import com.blockware.spring.annotation.BlockwareRestClient;
+import com.kapeta.spring.annotation.KapetaRestClient;
 import com.blockware.spring.cluster.BlockwareClusterService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +42,7 @@ public class RestClientFactorySupport {
             throw new IllegalArgumentException("Expected interface but got class: " + restClientInterface);
         }
 
-        BlockwareRestClient restClient = restClientInterface.getAnnotation(BlockwareRestClient.class);
+        KapetaRestClient restClient = restClientInterface.getAnnotation(KapetaRestClient.class);
 
         if (restClient == null) {
             throw new IllegalArgumentException("Expected interface with InternalServiceClient annotation for class: " + restClientInterface);

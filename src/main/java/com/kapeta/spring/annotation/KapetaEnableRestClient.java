@@ -1,7 +1,7 @@
-package com.blockware.spring.annotation;
+package com.kapeta.spring.annotation;
 
-import com.blockware.spring.restclient.RestClientBeanRegistrar;
-import com.blockware.spring.restclient.RestClientConfig;
+import com.kapeta.spring.restclient.RestClientBeanRegistrar;
+import com.kapeta.spring.restclient.RestClientConfig;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -11,5 +11,5 @@ import java.lang.annotation.*;
 @Documented
 @Inherited
 @Import({RestClientBeanRegistrar.class, RestClientConfig.class})
-public @interface BlockwareEnableRestClient {
+public @interface KapetaEnableRestClient {
 }

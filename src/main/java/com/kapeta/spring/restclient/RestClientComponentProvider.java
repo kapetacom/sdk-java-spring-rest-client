@@ -1,6 +1,6 @@
-package com.blockware.spring.restclient;
+package com.kapeta.spring.restclient;
 
-import com.blockware.spring.annotation.BlockwareRestClient;
+import com.kapeta.spring.annotation.KapetaRestClient;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.AnnotationConfigUtils;
@@ -22,7 +22,7 @@ public class RestClientComponentProvider extends ClassPathScanningCandidateCompo
                 return false;
             }
 
-            if (metadataReader.getAnnotationMetadata().hasAnnotation(BlockwareRestClient.class.getName())) {
+            if (metadataReader.getAnnotationMetadata().hasAnnotation(KapetaRestClient.class.getName())) {
                 return true;
             }
 
@@ -37,7 +37,7 @@ public class RestClientComponentProvider extends ClassPathScanningCandidateCompo
             return false;
         }
 
-        return beanDefinition.getMetadata().hasAnnotation(BlockwareRestClient.class.getName());
+        return beanDefinition.getMetadata().hasAnnotation(KapetaRestClient.class.getName());
     }
 
     @Override

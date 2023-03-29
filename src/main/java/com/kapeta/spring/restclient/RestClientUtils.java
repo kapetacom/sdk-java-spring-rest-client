@@ -1,4 +1,4 @@
-package com.blockware.spring.restclient;
+package com.kapeta.spring.restclient;
 
 
 import retrofit2.Call;
