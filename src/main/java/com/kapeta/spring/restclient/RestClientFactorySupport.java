@@ -3,7 +3,7 @@ package com.kapeta.spring.restclient;
 
 import com.kapeta.spring.annotation.KapetaRestClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kapeta.spring.cluster.KapetaClusterService;
+import com.kapeta.spring.config.providers.KapetaConfigurationProvider;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class RestClientFactorySupport {
     private Environment environment;
 
     @Autowired
-    private KapetaClusterService kapetaConfigSource;
+    private KapetaConfigurationProvider configurationProvider;
 
     public <T> T makeClient(Class<T> restClientInterface) {
 
@@ -67,7 +67,7 @@ public class RestClientFactorySupport {
         String base = getString(serviceName, "base", null);
 
         if (base == null || base.isEmpty()) {
-            base = kapetaConfigSource.getServiceAddress(serviceName, SERVICE_TYPE);
+            base = configurationProvider.getServiceAddress(serviceName, SERVICE_TYPE);
         }
 
         if (base == null || base.isEmpty()) {
