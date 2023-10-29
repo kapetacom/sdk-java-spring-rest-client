@@ -1,3 +1,7 @@
+/*
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: MIT
+ */
 package com.kapeta.spring.restclient;
 
 import lombok.extern.slf4j.Slf4j;
