@@ -8,10 +8,16 @@ package com.kapeta.spring.restclient;
 import com.kapeta.spring.annotation.KapetaRestClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kapeta.spring.config.providers.KapetaConfigurationProvider;
+import com.kapeta.spring.security.AuthorizationForwarder;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.server.ResponseStatusException;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -30,15 +36,26 @@ public class RestClientFactorySupport {
     private static final String RESTCLIENT_PREFIX = "kapeta.clients.";
     public static final String SERVICE_TYPE = "rest";
 
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final Environment environment;
 
-    @Autowired
-    private Environment environment;
+    private final KapetaConfigurationProvider configurationProvider;
 
-    @Autowired
-    private KapetaConfigurationProvider configurationProvider;
+    private final AuthorizationForwarder authorizationForwarder;
+
+    @Value("${kapeta.block.ref}")
+    private String blockRef;
+
+    @Value("${kapeta.instance.id}")
+    private String instanceId;
+
+    public RestClientFactorySupport(ObjectMapper objectMapper, Environment environment, KapetaConfigurationProvider configurationProvider, AuthorizationForwarder authorizationForwarder) {
+        this.objectMapper = objectMapper;
+        this.environment = environment;
+        this.configurationProvider = configurationProvider;
+        this.authorizationForwarder = authorizationForwarder;
+    }
 
     public <T> T makeClient(Class<T> restClientInterface) {
 
@@ -105,6 +122,31 @@ public class RestClientFactorySupport {
                 .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
                 .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
                 .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
+                .addInterceptor((chain) -> {
+                    var builder = chain.request().newBuilder()
+                            .addHeader("Accept", "application/json")
+                            .addHeader("Content-Type", "application/json")
+                            .addHeader("X-Kapeta-Instance", instanceId)
+                            .addHeader("X-Kapeta-Block", blockRef)
+                            .addHeader("User-Agent", blockRef);
+
+                    if (authorizationForwarder != null) {
+                        var header = authorizationForwarder.getAuthorizationHeader();
+                        var value = authorizationForwarder.getAuthorizationValue();
+                        if (header != null && value != null) {
+                            builder = builder.addHeader(header, value);
+                        }
+                    }
+                    var request = builder.build();
+                    var response = chain.proceed(request);
+
+                    if (!response.isSuccessful() && response.code() != 404) {
+                        // Forwards the error code to the client
+                        throw new ResponseStatusException(HttpStatusCode.valueOf(response.code()));
+                    }
+
+                    return response;
+                })
                 .build();
     }
 
