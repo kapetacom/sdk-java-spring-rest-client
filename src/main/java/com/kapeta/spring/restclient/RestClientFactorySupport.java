@@ -15,6 +15,7 @@ import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.server.ResponseStatusException;
@@ -123,6 +124,7 @@ public class RestClientFactorySupport {
                 .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
                 .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
                 .addInterceptor((chain) -> {
+                    var pageable = chain.request().tag(Pageable.class);
                     var builder = chain.request().newBuilder()
                             .addHeader("Accept", "application/json")
                             .addHeader("Content-Type", "application/json")
@@ -137,7 +139,27 @@ public class RestClientFactorySupport {
                             builder = builder.addHeader(header, value);
                         }
                     }
+
+                    if (pageable != null) {
+                        var urlBuilder = builder.getUrl$okhttp().newBuilder();
+
+                        if (pageable.getPageNumber() != 0) {
+                            urlBuilder.addQueryParameter("page", String.valueOf(pageable.getPageNumber()));
+                        }
+                        if (pageable.getPageSize() != 0) {
+                            urlBuilder.addQueryParameter("size", String.valueOf(pageable.getPageSize()));
+                        }
+                        if (pageable.getSort() != null && !pageable.getSort().isEmpty()) {
+                            for(var order : pageable.getSort()) {
+                                urlBuilder.addQueryParameter("sort", order.getProperty() + "," + order.getDirection().toString().toLowerCase());
+                            }
+                        }
+                        builder.setUrl$okhttp(urlBuilder.build());
+                    }
+
                     var request = builder.build();
+
+
                     var response = chain.proceed(request);
 
                     if (!response.isSuccessful() && response.code() != 404) {

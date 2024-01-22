@@ -7,7 +7,7 @@
 
     <groupId>com.kapeta</groupId>
     <artifactId>rest-client</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -160,7 +160,7 @@
         <dependency>
             <groupId>com.kapeta</groupId>
             <artifactId>spring-boot</artifactId>
-            <version>[0.2.0,2.0)</version>
+            <version>[0.3.0,2.0)</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
